@@ -142,46 +142,30 @@ public class JsonLexer {
 		while (i < length) {
 			final var c = s.charAt(i);
 
+			if (Character.isWhitespace(c)) {
+				++i;
+				continue;
+			}
+
+			if (Character.isDigit(c)) {
+				final var j = endIndexOfNumber(s, i);
+				final var num = s.substring(i, j);
+				tokens.add(new Token(Token.Type.NUMBER, parseNumber(num)));
+				i = j;
+				continue;
+			}
+
 			switch (c) {
-				// whitespace
-				case ' ':
-				case '\n':
-				case '\t':
-				case '\r': {
-					++i;
-					continue;
-				}
-
-				// number
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-				case '-': {
-					final var j = endIndexOfNumber(s, i);
-					final var num = s.substring(i, j);
-					tokens.add(new Token(Token.Type.NUMBER, parseNumber(num)));
-					i = j;
-					continue;
-				}
-
 				// structural delimiters
 				case '{':
 				case '}':
 				case '[':
 				case ']':
 				case ',':
-				case ':': {
+				case ':':
 					tokens.add(new Token(Token.Type.fromChar(c)));
 					++i;
 					continue;
-				}
 
 				// string
 				case '"': {
@@ -190,14 +174,14 @@ public class JsonLexer {
 						throw new JsonLexerException("String not closed");
 					}
 					final var str = s.substring(i + 1, j);
-// ESCAPE THE ESCAPE SEQUENCES HERE
+// ESCAPE THE ESCAPE SEQUENCES INSIDE STRINGS HERE
 					tokens.add(new Token(Token.Type.STRING, str));
 					i = j + 1;
 					continue;
 				}
 
 				// boolean true
-				case 't': {
+				case 't':
 					if (s.substring(i, i + 4).equals("true")) {
 						tokens.add(new Token(Token.Type.BOOLEAN, Boolean.TRUE));
 					} else {
@@ -205,10 +189,9 @@ public class JsonLexer {
 					}
 					i += 4;
 					continue;
-				}
 
 				// boolean false
-				case 'f': {
+				case 'f':
 					if (s.substring(i, i + 5).equals("false")) {
 						tokens.add(new Token(Token.Type.BOOLEAN, Boolean.FALSE));
 					} else {
@@ -216,10 +199,9 @@ public class JsonLexer {
 					}
 					i += 5;
 					continue;
-				}
 
 				// null
-				case 'n': {
+				case 'n':
 					if (s.substring(i, i + 4).equals("null")) {
 						tokens.add(new Token(Token.Type.NULL));
 					} else {
@@ -227,7 +209,6 @@ public class JsonLexer {
 					}
 					i += 4;
 					continue;
-				}
 			}
 		}
 

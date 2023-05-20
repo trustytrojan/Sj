@@ -97,17 +97,18 @@ final class JsonParser {
 	}
 
 	/**
-	 * Searches this token list for a token of type {@code COMMA} starting at
-	 * {@code startIndex}.
+	 * Searches this token list for a token of type {@code COMMA} at the same
+	 * container depth as the token at {@code startIndex}.
 	 * 
 	 * @param tokens list of tokens to search
 	 * @return the index of the first {@code COMMA} token found, otherwise
 	 *         {@code tokens.size()}
 	 */
 	private static int indexOfNextNonNestedComma(List<Token> tokens, int startIndex) {
-		if (representsObject(tokens) || representsArray(tokens)) {
-			tokens = withoutFirstAndLastTokens(tokens);
-		}
+		/**
+		 * Usually this branch is not covered as parseArray and parseObject only call
+		 * this function with tokens being a sublist of the tokens they were given.
+		 */
 		final var size = tokens.size();
 		var depth = 0;
 		for (var i = startIndex; i < size; ++i) {
@@ -125,7 +126,8 @@ final class JsonParser {
 						return i;
 					}
 				}
-				default -> {}
+				default -> {
+				}
 			}
 		}
 		return size;
@@ -174,9 +176,11 @@ final class JsonParser {
 	 * case 't' -> '\t';
 	 * //case 'u' -> Character.toChars(Integer.parseInt(s.substring(i + 2, i + 6),
 	 * 16))[0];
-	 * default -> throw new JsonParserException("Input is not a valid JSON string!");
+	 * default -> throw new
+	 * JsonParserException("Input is not a valid JSON string!");
 	 * });
-	 * case '"' -> throw new JsonParserException("Input is not a valid JSON string!");
+	 * case '"' -> throw new JsonParserException("Input is not a valid JSON
+	 * string!");
 	 * default -> sb.append(s.charAt(i));
 	 * }
 	 * }
