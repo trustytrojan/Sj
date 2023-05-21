@@ -104,34 +104,9 @@ final class JsonLexer {
 	}
 
 	private static Number parseNumber(String s) {
-		final var length = s.length();
-
-		if (length <= 3) {
-			try {
-				return Byte.parseByte(s);
-			} catch (NumberFormatException e) {
-			}
-		}
-
-		if (length <= 5) {
-			try {
-				return Short.parseShort(s);
-			} catch (NumberFormatException e) {
-			}
-		}
-
-		if (length <= 10) {
-			try {
-				return Integer.parseInt(s);
-			} catch (NumberFormatException e) {
-			}
-		}
-
-		if (length <= 19) {
-			try {
-				return Long.parseLong(s);
-			} catch (NumberFormatException e) {
-			}
+		try {
+			Long.parseLong(s);
+		} catch (NumberFormatException e) {
 		}
 
 		return Double.parseDouble(s);
@@ -215,11 +190,5 @@ final class JsonLexer {
 		}
 
 		return tokens;
-	}
-
-	public static void main(String[] args) {
-		final var jsonStr = FileReader.readFile("test.json");
-		final var tokens = lex(jsonStr);
-		System.out.println(tokens);
 	}
 }

@@ -17,7 +17,7 @@ final class JsonParser {
 		}
 	}
 
-	private static Object parse(List<Token> tokens) {
+	static Object parse(List<Token> tokens) {
 		if (tokens.size() == 0) {
 			throw new JsonParserException("Tokens list is empty");
 		}
@@ -33,7 +33,7 @@ final class JsonParser {
 		};
 	}
 
-	private static List<Object> parseArray(List<Token> tokens) {
+	static List<Object> parseArray(List<Token> tokens) {
 		if (!representsArray(tokens)) {
 			throw new JsonParserException("Not a JSON array");
 		}
@@ -56,7 +56,7 @@ final class JsonParser {
 		return Collections.unmodifiableList(array);
 	}
 
-	private static Map<String, Object> parseObject(List<Token> tokens) {
+	static Map<String, Object> parseObject(List<Token> tokens) {
 		if (!representsObject(tokens)) {
 			throw new JsonParserException("Not a JSON object");
 		}
@@ -105,18 +105,13 @@ final class JsonParser {
 	 *         {@code tokens.size()}
 	 */
 	private static int indexOfNextNonNestedComma(List<Token> tokens, int startIndex) {
-		/**
-		 * Usually this branch is not covered as parseArray and parseObject only call
-		 * this function with tokens being a sublist of the tokens they were given.
-		 */
 		final var size = tokens.size();
 		var depth = 0;
 		for (var i = startIndex; i < size; ++i) {
 			if (depth < 0) {
 				throw new JsonParserException("Invalid JSON container: depth < 0");
 			}
-			final var token = tokens.get(i);
-			switch (token.type) {
+			switch (tokens.get(i).type) {
 				case LEFT_BRACE -> ++depth;
 				case LEFT_BRACKET -> ++depth;
 				case RIGHT_BRACE -> --depth;
