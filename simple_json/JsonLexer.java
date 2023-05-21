@@ -3,7 +3,9 @@ package simple_json;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonLexer {
+final class JsonLexer {
+	private JsonLexer() {}
+
 	public static class Token {
 		public static enum Type {
 			LEFT_BRACE,
