@@ -6,60 +6,6 @@ import java.util.List;
 final class JsonLexer {
 	private JsonLexer() {}
 
-	public static class Token {
-		public static enum Type {
-			LEFT_BRACE,
-			RIGHT_BRACE,
-			LEFT_BRACKET,
-			RIGHT_BRACKET,
-			COMMA,
-			COLON,
-			STRING,
-			NUMBER,
-			BOOLEAN,
-			NULL;
-
-			private static Type fromChar(char c) {
-				return switch (c) {
-					case '{' -> LEFT_BRACE;
-					case '}' -> RIGHT_BRACE;
-					case '[' -> LEFT_BRACKET;
-					case ']' -> RIGHT_BRACKET;
-					case ',' -> COMMA;
-					case ':' -> COLON;
-					default -> null;
-				};
-			}
-		}
-
-		public final Type type;
-		public final Object value;
-
-		private Token(Type type, Object value) {
-			this.type = type;
-			this.value = value;
-		}
-
-		private Token(Type type) {
-			this(type, null);
-		}
-
-		@Override
-		public String toString() {
-			final var sb = new StringBuilder("(" + type);
-			if (value == null) {
-				return sb.append(')').toString();
-			} else {
-				sb.append(", ");
-				if (value instanceof final String s) {
-					return sb.append('"' + s + "\")").toString();
-				} else {
-					return sb.append(value.toString() + ')').toString();
-				}
-			}
-		}
-	}
-
 	private static class JsonLexerException extends RuntimeException {
 		JsonLexerException(String message) {
 			super(message);
@@ -127,20 +73,40 @@ final class JsonLexer {
 			if (Character.isDigit(c)) {
 				final var j = endIndexOfNumber(s, i);
 				final var num = s.substring(i, j);
-				tokens.add(new Token(Token.Type.NUMBER, parseNumber(num)));
+				tokens.add(Value.of(parseNumber(num)));
 				i = j;
 				continue;
 			}
 
 			switch (c) {
-				// structural delimiters
+				// structural delimters
 				case '{':
+					tokens.add(StructuralToken.LEFT_BRACE);
+					++i;
+					continue;
+
 				case '}':
+					tokens.add(StructuralToken.RIGHT_BRACE);
+					++i;
+					continue;
+
 				case '[':
+					tokens.add(StructuralToken.LEFT_BRACKET);
+					++i;
+					continue;
+
 				case ']':
+					tokens.add(StructuralToken.RIGHT_BRACKET);
+					++i;
+					continue;
+
 				case ',':
+					tokens.add(StructuralToken.COMMA);
+					++i;
+					continue;
+				
 				case ':':
-					tokens.add(new Token(Token.Type.fromChar(c)));
+					tokens.add(StructuralToken.COLON);
 					++i;
 					continue;
 
@@ -152,7 +118,7 @@ final class JsonLexer {
 					}
 					final var str = s.substring(i + 1, j);
 // ESCAPE THE ESCAPE SEQUENCES INSIDE STRINGS HERE
-					tokens.add(new Token(Token.Type.STRING, str));
+					tokens.add(Value.of(str));
 					i = j + 1;
 					continue;
 				}
@@ -160,7 +126,7 @@ final class JsonLexer {
 				// boolean true
 				case 't':
 					if (s.substring(i, i + 4).equals("true")) {
-						tokens.add(new Token(Token.Type.BOOLEAN, Boolean.TRUE));
+						tokens.add(Value.TRUE);
 					} else {
 						throw new JsonLexerException("Malformed boolean true");
 					}
@@ -170,7 +136,7 @@ final class JsonLexer {
 				// boolean false
 				case 'f':
 					if (s.substring(i, i + 5).equals("false")) {
-						tokens.add(new Token(Token.Type.BOOLEAN, Boolean.FALSE));
+						tokens.add(Value.FALSE);
 					} else {
 						throw new JsonLexerException("Malformed boolean false");
 					}
@@ -180,7 +146,7 @@ final class JsonLexer {
 				// null
 				case 'n':
 					if (s.substring(i, i + 4).equals("null")) {
-						tokens.add(new Token(Token.Type.NULL));
+						tokens.add(Value.NULL);
 					} else {
 						throw new JsonLexerException("Malformed null");
 					}

@@ -6,9 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import simple_json.JsonLexer.Token;
-
-final class JsonParser {
+public final class JsonParser {
 	private JsonParser() {}
 
 	private static class JsonParserException extends RuntimeException {
@@ -24,12 +22,16 @@ final class JsonParser {
 
 		final var firstToken = tokens.get(0);
 
-		return switch (firstToken.type) {
-			case LEFT_BRACKET -> parseArray(tokens);
-			case LEFT_BRACE -> parseObject(tokens);
-			case COMMA -> throw new JsonParserException("First token is comma");
-			case COLON -> throw new JsonParserException("First token is colon");
-			default -> firstToken.value;
+		return switch (firstToken) {
+			case final StructuralToken st -> switch (st) {
+				case LEFT_BRACKET -> parseArray(tokens);
+				case LEFT_BRACE -> parseObject(tokens);
+				default -> throw new JsonParserException("what the hell?");
+			};
+
+			case final Value v -> v.value;
+
+			default -> throw new JsonParserException("what the hell?");
 		};
 	}
 
@@ -81,14 +83,14 @@ final class JsonParser {
 	}
 
 	private static boolean representsObject(List<Token> tokens) {
-		final var firstTokenIsLeftBrace = tokens.get(0).type == Token.Type.LEFT_BRACE;
-		final var lastTokenIsRightBrace = tokens.get(tokens.size() - 1).type == Token.Type.RIGHT_BRACE;
+		final var firstTokenIsLeftBrace = tokens.get(0) == StructuralToken.LEFT_BRACE;
+		final var lastTokenIsRightBrace = tokens.get(tokens.size() - 1) == StructuralToken.RIGHT_BRACE;
 		return firstTokenIsLeftBrace && lastTokenIsRightBrace;
 	}
 
 	private static boolean representsArray(List<Token> tokens) {
-		final var firstTokenIsLeftBracket = tokens.get(0).type == Token.Type.LEFT_BRACKET;
-		final var lastTokenIsRightBracket = tokens.get(tokens.size() - 1).type == Token.Type.RIGHT_BRACKET;
+		final var firstTokenIsLeftBracket = tokens.get(0) == StructuralToken.LEFT_BRACKET;
+		final var lastTokenIsRightBracket = tokens.get(tokens.size() - 1) == StructuralToken.RIGHT_BRACKET;
 		return firstTokenIsLeftBracket && lastTokenIsRightBracket;
 	}
 
@@ -111,17 +113,18 @@ final class JsonParser {
 			if (depth < 0) {
 				throw new JsonParserException("Invalid JSON container: depth < 0");
 			}
-			switch (tokens.get(i).type) {
-				case LEFT_BRACE -> ++depth;
-				case LEFT_BRACKET -> ++depth;
-				case RIGHT_BRACE -> --depth;
-				case RIGHT_BRACKET -> --depth;
-				case COMMA -> {
-					if (depth == 0) {
-						return i;
+			if (tokens.get(i) instanceof final StructuralToken st) {
+				switch (st) {
+					case LEFT_BRACE -> ++depth;
+					case LEFT_BRACKET -> ++depth;
+					case RIGHT_BRACE -> --depth;
+					case RIGHT_BRACKET -> --depth;
+					case COMMA -> {
+						if (depth == 0) {
+							return i;
+						}
 					}
-				}
-				default -> {
+					default -> {}
 				}
 			}
 		}
@@ -135,16 +138,13 @@ final class JsonParser {
 			throw new JsonParserException("Invalid JSON object entry: size < 3");
 		}
 
-		final var keyToken = tokens.get(0);
-		final var colonToken = tokens.get(1);
-
-		if (keyToken.type != Token.Type.STRING) {
+		if (!(((Value) tokens.get(0)).value instanceof final String key)) {
 			throw new JsonParserException("Invalid JSON object entry: key is not a string");
-		} else if (colonToken.type != Token.Type.COLON) {
+		} else if (tokens.get(1) != StructuralToken.COLON) {
 			throw new JsonParserException("Invalid JSON object entry: no colon present");
 		}
 
-		return Map.entry((String) keyToken.value, parse(tokens.subList(2, size)));
+		return Map.entry(key, parse(tokens.subList(2, size)));
 	}
 
 	/*
