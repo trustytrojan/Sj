@@ -3,8 +3,8 @@ package simple_json;
 import java.util.ArrayList;
 import java.util.List;
 
-final class JsonLexer {
-	private JsonLexer() {}
+final class Lexer {
+	private Lexer() {}
 
 	private static class JsonLexerException extends RuntimeException {
 		JsonLexerException(String message) {
@@ -56,6 +56,35 @@ final class JsonLexer {
 		}
 
 		return Double.parseDouble(s);
+	}
+
+	private static String parseString(String s) {
+		final var length = s.length();
+	
+		final var sb = new StringBuilder();
+	
+		for (int i = 0; i < length; ++i) {
+			switch (s.charAt(i)) {
+				case '\\' ->
+					sb.append(switch (s.charAt(++i)) {
+						case '"' -> '"';
+						case '\\' -> '\\';
+						case '/' -> '/';
+						case 'b' -> '\b';
+						case 'f' -> '\f';
+						case 'n' -> '\n';
+						case 'r' -> '\r';
+						case 't' -> '\t';
+						// unicode escapes not supported yet
+						//case 'u' -> Character.toChars(Integer.parseInt(s.substring(i + 2, i + 6), 16))[0];
+						default -> throw new JsonLexerException("Input is not a valid JSON string!");
+					});
+				case '"' -> throw new JsonLexerException("Input is not a valid JSON string!");
+				default -> sb.append(s.charAt(i));
+			}
+		}
+	
+		return sb.toString();
 	}
 
 	public static List<Token> lex(String s) {
@@ -116,7 +145,7 @@ final class JsonLexer {
 					if (j == -1) {
 						throw new JsonLexerException("String not closed");
 					}
-					final var str = s.substring(i + 1, j);
+					final var str = parseString(s.substring(i + 1, j));
 // ESCAPE THE ESCAPE SEQUENCES INSIDE STRINGS HERE
 					tokens.add(Value.of(str));
 					i = j + 1;

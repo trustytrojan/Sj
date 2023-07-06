@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public final class JsonObject {
+public final class SjObject {
 	private final Map<String, Object> obj;
 
-	public JsonObject() {
+	public SjObject() {
 		obj = new HashMap<>();
 	}
 
-	public JsonObject(Map<String, Object> obj) {
+	public SjObject(Map<String, Object> obj) {
 		this.obj = Objects.requireNonNull(obj);
 	}
 
@@ -63,7 +63,7 @@ public final class JsonObject {
 	}
 
 	@SuppressWarnings("unchecked")
-	public JsonObject getObject(String key) {
-		return new JsonObject((Map<String, Object>) obj.get(key));
+	public SjObject getObject(String key) {
+		return new SjObject((Map<String, Object>) obj.get(key));
 	}
 }

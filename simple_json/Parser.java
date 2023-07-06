@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class JsonParser {
-	private JsonParser() {}
+public final class Parser {
+	private Parser() {}
 
 	private static class JsonParserException extends RuntimeException {
 		JsonParserException(String message) {
@@ -146,41 +146,4 @@ public final class JsonParser {
 
 		return Map.entry(key, parse(tokens.subList(2, size)));
 	}
-
-	/*
-	 * private static String parseString(String s) {
-	 * final var length = s.length();
-	 * 
-	 * if (s.charAt(0) != '"' || s.charAt(length - 1) != '"') {
-	 * throw new JsonParserException("Input is not a valid JSON string!");
-	 * }
-	 * 
-	 * final var sb = new StringBuilder();
-	 * 
-	 * for (int i = 1; i < length - 1; ++i) {
-	 * switch (s.charAt(i)) {
-	 * case '\\' ->
-	 * sb.append(switch (s.charAt(++i)) {
-	 * case '"' -> '"';
-	 * case '\\' -> '\\';
-	 * case '/' -> '/';
-	 * case 'b' -> '\b';
-	 * case 'f' -> '\f';
-	 * case 'n' -> '\n';
-	 * case 'r' -> '\r';
-	 * case 't' -> '\t';
-	 * //case 'u' -> Character.toChars(Integer.parseInt(s.substring(i + 2, i + 6),
-	 * 16))[0];
-	 * default -> throw new
-	 * JsonParserException("Input is not a valid JSON string!");
-	 * });
-	 * case '"' -> throw new JsonParserException("Input is not a valid JSON
-	 * string!");
-	 * default -> sb.append(s.charAt(i));
-	 * }
-	 * }
-	 * 
-	 * return sb.toString();
-	 * }
-	 */
 }
