@@ -1,2 +1,2 @@
 # sj
-A simple JSON parser inspired by [JSON.simple](https://github.com/fangyidong/json-simple)
+a simple json parser inspired by [JSON.simple](https://github.com/fangyidong/json-simple)
