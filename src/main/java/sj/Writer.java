@@ -1,17 +1,9 @@
-package simple_json;
+package sj;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 class Writer {
-	public static void main(String[] args) {
-		final var m = new HashMap<>();
-		m.put("nig1", "nig2");
-		m.put("nig3", List.of(1, 4, 6));
-		System.out.println(writePretty(m, 0));
-	}
-
 	private static class WriterException extends RuntimeException {
 		WriterException(String message) {
 			super(message);

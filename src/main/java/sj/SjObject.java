@@ -1,4 +1,4 @@
-package simple_json;
+package sj;
 
 import java.util.Collection;
 import java.util.HashMap;

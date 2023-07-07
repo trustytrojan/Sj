@@ -1,4 +1,4 @@
-package simple_json;
+package sj;
 
 import java.util.List;
 import java.util.Map;
@@ -34,5 +34,9 @@ public final class Sj {
 		return parseArray(s).stream()
 			.map(x -> new SjObject((Map<String, Object>) x))
 			.toList();
+	}
+
+	public static String write(Object o) {
+		return Writer.write(o);
 	}
 }
