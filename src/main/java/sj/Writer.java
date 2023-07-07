@@ -3,7 +3,9 @@ package sj;
 import java.util.List;
 import java.util.Map;
 
-class Writer {
+final class Writer {
+	private Writer() {}
+
 	private static class WriterException extends RuntimeException {
 		WriterException(String message) {
 			super(message);
