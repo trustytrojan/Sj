@@ -11,26 +11,23 @@ enum StructuralToken implements Token {
 	COMMA, COLON
 }
 
-class Value implements Token {
-	static final Value NULL = new Value(null);
-	static final Value TRUE = new Value(true);
-	static final Value FALSE = new Value(false);
+final class ValueToken implements Token {
+	static final ValueToken NULL = new ValueToken(null);
+	static final ValueToken TRUE = new ValueToken(true);
+	static final ValueToken FALSE = new ValueToken(false);
 
-	private static final HashMap<Object, Value> CACHE = new HashMap<>();
+	private static final HashMap<Object, ValueToken> CACHE = new HashMap<>();
 
-	static Value of(Object o) {
+	static ValueToken of(Object o) {
 		final var cachedValue = CACHE.get(o);
-
-		if (cachedValue != null) {
+		if (cachedValue != null)
 			return cachedValue;
-		}
-
-		return new Value(o);
+		return new ValueToken(o);
 	}
 
 	final Object value;
 
-	private Value(Object value) {
+	private ValueToken(Object value) {
 		this.value = value;
 	}
 
@@ -39,10 +36,8 @@ class Value implements Token {
 	 */
 	@Override
 	public String toString() {
-		if (value == null) {
+		if (value == null)
 			return "null";
-		}
-
 		return value.getClass().getSimpleName() + '(' + value + ')';
 	}
 }

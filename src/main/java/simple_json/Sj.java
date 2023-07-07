@@ -3,9 +3,11 @@ package simple_json;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The primary interface of Sj.
+ */
 public final class Sj {
-	private Sj() {
-	}
+	private Sj() {}
 
 	public static Object parse(String s) {
 		return Parser.parse(Lexer.lex(s));
@@ -20,8 +22,9 @@ public final class Sj {
 	}
 
 	/**
-	 * Use only if you know for sure that what you're parsing
-	 * is a JSON array of JSON objects.
+	 * Use only if you know for sure that what you're parsing is a JSON array of
+	 * JSON objects. Will throw {@code ClassCastException} if the array does not
+	 * contain JSON objects.
 	 * 
 	 * @param s JSON string representing array of objects
 	 * @return a list of {@code JsonObject} elements

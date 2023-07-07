@@ -6,8 +6,8 @@ import java.util.List;
 final class Lexer {
 	private Lexer() {}
 
-	private static class JsonLexerException extends RuntimeException {
-		JsonLexerException(String message) {
+	private static class LexerException extends RuntimeException {
+		LexerException(String message) {
 			super(message);
 		}
 	}
@@ -36,7 +36,7 @@ final class Lexer {
 
 			if (c == '.') {
 				if (decimalPointFound) {
-					throw new JsonLexerException("Two decimal points found!");
+					throw new LexerException("Two decimal points found!");
 				}
 				decimalPointFound = true;
 				continue;
@@ -52,19 +52,16 @@ final class Lexer {
 	private static Number parseNumber(String s) {
 		try {
 			Long.parseLong(s);
-		} catch (NumberFormatException e) {
-		}
-
+		} catch (NumberFormatException e) {}
 		return Double.parseDouble(s);
 	}
 
-	private static String parseString(String s) {
+	private static String escapeEscapeSequences(String s) {
 		final var length = s.length();
-	
 		final var sb = new StringBuilder();
-	
 		for (int i = 0; i < length; ++i) {
-			switch (s.charAt(i)) {
+			final var c = s.charAt(i);
+			switch (c) {
 				case '\\' ->
 					sb.append(switch (s.charAt(++i)) {
 						case '"' -> '"';
@@ -77,13 +74,12 @@ final class Lexer {
 						case 't' -> '\t';
 						// unicode escapes not supported yet
 						//case 'u' -> Character.toChars(Integer.parseInt(s.substring(i + 2, i + 6), 16))[0];
-						default -> throw new JsonLexerException("Input is not a valid JSON string!");
+						default -> throw new LexerException("Input is not a valid JSON string!");
 					});
-				case '"' -> throw new JsonLexerException("Input is not a valid JSON string!");
-				default -> sb.append(s.charAt(i));
+				case '"' -> throw new LexerException("Input is not a valid JSON string!");
+				default -> sb.append(c);
 			}
 		}
-	
 		return sb.toString();
 	}
 
@@ -102,7 +98,7 @@ final class Lexer {
 			if (Character.isDigit(c)) {
 				final var j = endIndexOfNumber(s, i);
 				final var num = s.substring(i, j);
-				tokens.add(Value.of(parseNumber(num)));
+				tokens.add(ValueToken.of(parseNumber(num)));
 				i = j;
 				continue;
 			}
@@ -142,43 +138,38 @@ final class Lexer {
 				// string
 				case '"': {
 					final var j = indexOfNextUnescapedDoubleQuote(s, i + 1);
-					if (j == -1) {
-						throw new JsonLexerException("String not closed");
-					}
-					final var str = parseString(s.substring(i + 1, j));
-// ESCAPE THE ESCAPE SEQUENCES INSIDE STRINGS HERE
-					tokens.add(Value.of(str));
+					if (j == -1)
+						throw new LexerException("String not closed");
+					final var str = escapeEscapeSequences(s.substring(i + 1, j));
+					tokens.add(ValueToken.of(str));
 					i = j + 1;
 					continue;
 				}
 
 				// boolean true
 				case 't':
-					if (s.substring(i, i + 4).equals("true")) {
-						tokens.add(Value.TRUE);
-					} else {
-						throw new JsonLexerException("Malformed boolean true");
-					}
+					if (s.substring(i, i + 4).equals("true"))
+						tokens.add(ValueToken.TRUE);
+					else
+						throw new LexerException("Malformed boolean true");
 					i += 4;
 					continue;
 
 				// boolean false
 				case 'f':
-					if (s.substring(i, i + 5).equals("false")) {
-						tokens.add(Value.FALSE);
-					} else {
-						throw new JsonLexerException("Malformed boolean false");
-					}
+					if (s.substring(i, i + 5).equals("false"))
+						tokens.add(ValueToken.FALSE);
+					else
+						throw new LexerException("Malformed boolean false");
 					i += 5;
 					continue;
 
 				// null
 				case 'n':
-					if (s.substring(i, i + 4).equals("null")) {
-						tokens.add(Value.NULL);
-					} else {
-						throw new JsonLexerException("Malformed null");
-					}
+					if (s.substring(i, i + 4).equals("null"))
+						tokens.add(ValueToken.NULL);
+					else
+						throw new LexerException("Malformed null");
 					i += 4;
 					continue;
 			}
