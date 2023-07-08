@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The primary interface of Sj.
+ * The primary interface of sj.
  */
 public final class Sj {
 	private Sj() {}
