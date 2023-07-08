@@ -22,9 +22,20 @@ public final class SjObject implements SjSerializable {
 	}
 
 	@Override
+	public String toString() {
+		return toJsonString();
+	}
+
+	@Override
 	public String toJsonString() {
 		return Writer.write(map);
 	}
+
+	/*
+	 * The `put` methods have strict types on the `value` parameter.
+	 * This keeps it in line with what the `Writer` class expects, which
+	 * is the main purpose you would be adding data to an `SjObject` for.
+	 */
 
 	public void put(String key, String value) {
 		map.put(key, value);
@@ -39,9 +50,11 @@ public final class SjObject implements SjSerializable {
 	}
 
 	/**
-	 * For nested objects, call this with an {@code SjObject} as the value.
-	 * @param key
-	 * @param value
+	 * For nested objects, call this with an {@code SjObject} as the value. Any
+	 * other subtype of {@code SjSerializable} is accepted.
+	 * 
+	 * @param key   key to associate with the {@code SjSerializable}
+	 * @param value value to associate with {@code key}
 	 */
 	public void put(String key, SjSerializable value) {
 		map.put(key, value);
@@ -51,12 +64,23 @@ public final class SjObject implements SjSerializable {
 		map.put(key, value);
 	}
 
+	/*
+	 * The `get` methods, in contrast, do not have strict return types.
+	 * Use `get` if you do not know the type of the value associated with `key`.
+	 * Use the other typed `get` methods if you do know the type of the value
+	 * associated with `key`.
+	 */
+
+	public Object get(String key) {
+		return map.get(key);
+	}
+
 	public String getString(String key) {
-		return (String) map.get(key);
+		return (String) get(key);
 	}
 
 	public Long getLong(String key) {
-		return (Long) map.get(key);
+		return (Long) get(key);
 	}
 
 	public Integer getInteger(String key) {
@@ -75,7 +99,7 @@ public final class SjObject implements SjSerializable {
 	}
 
 	public Double getDouble(String key) {
-		return (Double) map.get(key);
+		return (Double) get(key);
 	}
 
 	public Float getFloat(String key) {
@@ -84,7 +108,7 @@ public final class SjObject implements SjSerializable {
 	}
 
 	public Boolean getBoolean(String key) {
-		return (Boolean) map.get(key);
+		return (Boolean) get(key);
 	}
 
 	public boolean getBooleanDefaultFalse(String key) {
@@ -93,12 +117,39 @@ public final class SjObject implements SjSerializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Object> getArray(String key) {
-		return (List<Object>) map.get(key);
+	public SjObject getObject(String key) {
+		return new SjObject((Map<String, Object>) get(key));
 	}
 
 	@SuppressWarnings("unchecked")
-	public SjObject getObject(String key) {
-		return new SjObject((Map<String, Object>) map.get(key));
+	public List<Object> getArray(String key) {
+		return (List<Object>) get(key);
+	}
+
+	/**
+	 * Use only if you know that the value associated with {@code key} is a JSON
+	 * array of JSON objects.
+	 * 
+	 * @param key key associated with a JSON array of JSON objects
+	 * @return a list of {@code SjObject} instances representing the objects
+	 */
+	@SuppressWarnings("unchecked")
+	public List<SjObject> getObjectArray(String key) {
+		return getArray(key).stream()
+				.map(o -> new SjObject((Map<String, Object>) o))
+				.toList();
+	}
+
+	/**
+	 * Use only if you know that the value associated with {@code key} is a JSON
+	 * array of strings.
+	 * 
+	 * @param key key associated with a JSON array of strings.
+	 * @return the {@code List<String>} that {@code key} maps to
+	 */
+	public List<String> getStringArray(String key) {
+		return getArray(key).stream()
+				.map(o -> (String) o)
+				.toList();
 	}
 }
