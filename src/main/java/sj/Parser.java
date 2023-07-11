@@ -24,7 +24,7 @@ final class Parser {
 		if (firstToken == StructuralToken.LEFT_BRACE)
 			return parseObject(tokens);
 		if (firstToken instanceof final ValueToken v)
-			return v;
+			return v.value;
 		throw new ParserException("why?");
 	}
 
