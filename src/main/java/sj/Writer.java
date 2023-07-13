@@ -49,7 +49,7 @@ final class Writer {
 	}
 
 	private static String writeMap(Map<String, Object> map) {
-		final var sb = new StringBuilder('{');
+		final var sb = new StringBuilder("{");
 		for (final var entry : map.entrySet())
 			sb.append('"' + entry.getKey() + "\":" + write(entry.getValue()));
 		return sb.append('}').toString();
@@ -76,10 +76,14 @@ final class Writer {
 	}
 
 	private static String writeList(List<Object> list) {
-		final var sb = new StringBuilder('[');
+		final var sb = new StringBuilder("[");
 		for (final var value : list)
 			sb.append(write(value));
 		return sb.append(']').toString();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(writeList(List.of("anime")));
 	}
 
 	private static String writeListPretty(List<Object> list, int depth) {
