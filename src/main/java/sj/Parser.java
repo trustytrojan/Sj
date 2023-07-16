@@ -1,5 +1,6 @@
 package sj;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -112,6 +113,6 @@ final class Parser {
 			throw new ParserException("Invalid JSON object entry: key is not a string");
 		else if (tokens.get(1) != StructuralToken.COLON)
 			throw new ParserException("Invalid JSON object entry: no colon present");
-		return Map.entry(key, parse(tokens.subList(2, size)));
+		return new SimpleImmutableEntry<>(key, parse(tokens.subList(2, size)));
 	}
 }
