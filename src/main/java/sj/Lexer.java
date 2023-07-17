@@ -56,14 +56,26 @@ final class Lexer {
 		return Double.parseDouble(s);
 	}
 
+	public static void main(String[] args) {
+		final var unescapedSkull = "\\uD83D\\uDC80";
+		final var shouldBeSkull = escapeEscapeSequences(unescapedSkull);
+		System.out.println(shouldBeSkull.length());
+		System.out.println(shouldBeSkull);
+	}
+
 	private static String escapeEscapeSequences(String s) {
 		final var length = s.length();
 		final var sb = new StringBuilder();
 		for (int i = 0; i < length; ++i) {
 			final var c = s.charAt(i);
 			switch (c) {
-				case '\\' ->
-					sb.append(switch (s.charAt(++i)) {
+				case '\\' -> {
+					final var c2 = s.charAt(++i);
+					if (c2 == 'u') {
+						final var substr = s.substring(i + 1, i + 5);
+						sb.appendCodePoint(Integer.parseInt(substr, 16));
+						i += 4;
+					} else sb.append(switch (c2) {
 						case '"' -> '"';
 						case '\\' -> '\\';
 						case '/' -> '/';
@@ -72,10 +84,9 @@ final class Lexer {
 						case 'n' -> '\n';
 						case 'r' -> '\r';
 						case 't' -> '\t';
-						// unicode escapes not supported yet
-						//case 'u' -> Character.toChars(Integer.parseInt(s.substring(i + 2, i + 6), 16))[0];
 						default -> throw new LexerException("Input is not a valid JSON string!");
 					});
+				}
 				case '"' -> throw new LexerException("Input is not a valid JSON string!");
 				default -> sb.append(c);
 			}
