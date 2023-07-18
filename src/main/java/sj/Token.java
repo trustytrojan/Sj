@@ -20,9 +20,10 @@ final class ValueToken implements Token {
 
 	static ValueToken of(Object o) {
 		final var cachedValue = CACHE.get(o);
-		if (cachedValue != null)
-			return cachedValue;
-		return new ValueToken(o);
+		if (cachedValue != null) return cachedValue;
+		final var vt = new ValueToken(o);
+		CACHE.put(o, vt);
+		return vt;
 	}
 
 	final Object value;
@@ -36,8 +37,7 @@ final class ValueToken implements Token {
 	 */
 	@Override
 	public String toString() {
-		if (value == null)
-			return "null";
-		return value.getClass().getSimpleName() + '(' + value + ')';
+		if (value == null) return "null";
+		return value.getClass().getSimpleName() + '(' + ((value instanceof String) ? ('"' + value.toString() + '"') : value) + ')';
 	}
 }

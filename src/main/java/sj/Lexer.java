@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class Lexer {
-	private Lexer() {}
-
 	private static class LexerException extends RuntimeException {
 		LexerException(String message) {
 			super(message);
@@ -50,17 +48,9 @@ final class Lexer {
 	}
 
 	private static Number parseNumber(String s) {
-		try {
-			Long.parseLong(s);
-		} catch (NumberFormatException e) {}
+		try { return Long.parseLong(s); }
+		catch (NumberFormatException e) {}
 		return Double.parseDouble(s);
-	}
-
-	public static void main(String[] args) {
-		final var unescapedSkull = "\\uD83D\\uDC80";
-		final var shouldBeSkull = escapeEscapeSequences(unescapedSkull);
-		System.out.println(shouldBeSkull.length());
-		System.out.println(shouldBeSkull);
 	}
 
 	private static String escapeEscapeSequences(String s) {
@@ -188,4 +178,6 @@ final class Lexer {
 
 		return tokens;
 	}
+
+	private Lexer() {}
 }

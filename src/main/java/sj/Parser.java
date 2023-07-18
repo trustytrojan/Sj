@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 final class Parser {
-	private Parser() {}
-
 	private static class ParserException extends RuntimeException {
 		ParserException(String message) {
 			super(message);
@@ -115,4 +113,6 @@ final class Parser {
 			throw new ParserException("Invalid JSON object entry: no colon present");
 		return new SimpleImmutableEntry<>(key, parse(tokens.subList(2, size)));
 	}
+
+	private Parser() {}
 }
