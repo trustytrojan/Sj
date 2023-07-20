@@ -103,6 +103,7 @@ final class Writer {
 
 	private static String writeListPretty(List<Object> list, int depth) {
 		final var size = list.size();
+		if (size == 0) return "[]";
 		final var sb = new StringBuilder("[\n");
 		for (var i = 0; i < size - 1; ++i)
 			writeElementPretty(sb, list.get(i), depth, true);
