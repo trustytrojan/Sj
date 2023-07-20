@@ -21,14 +21,17 @@ public final class SjObject implements SjSerializable {
 		this.map = Objects.requireNonNull(map);
 	}
 
-	@Override
-	public String toString() {
-		return toJsonString();
-	}
-
+	/**
+	 * By default, {@code toJsonString()} called from {@code SjSerializable} will be
+	 * an unformatted JSON string.
+	 */
 	@Override
 	public String toJsonString() {
-		return Writer.write(map);
+		return Sj.write(map);
+	}
+
+	public String toPrettyJsonString() {
+		return Sj.writePretty(map);
 	}
 
 	/*
@@ -50,8 +53,8 @@ public final class SjObject implements SjSerializable {
 	}
 
 	/**
-	 * For nested objects, call this with an {@code SjObject} as the value. Any
-	 * other subtype of {@code SjSerializable} is accepted.
+	 * For nested objects, it is suggested to call this with an {@code SjObject} as
+	 * the value. Any other subtype of {@code SjSerializable} is accepted.
 	 * 
 	 * @param key   key to associate with the {@code SjSerializable}
 	 * @param value value to associate with {@code key}

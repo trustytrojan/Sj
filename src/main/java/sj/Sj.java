@@ -7,7 +7,8 @@ import java.util.Map;
  * The primary interface of sj.
  */
 public final class Sj {
-	private Sj() {}
+	private Sj() {
+	}
 
 	public static Object parse(String s) {
 		return Parser.parse(Lexer.lex(s));
@@ -32,14 +33,27 @@ public final class Sj {
 	@SuppressWarnings("unchecked")
 	public static List<SjObject> parseObjectArray(String s) {
 		return parseArray(s).stream()
-			.map(x -> new SjObject((Map<String, Object>) x))
-			.toList();
+				.map(x -> new SjObject((Map<String, Object>) x))
+				.toList();
 	}
 
+	/**
+	 * Write {@code o} as a JSON string, if JSON serializable.
+	 * 
+	 * @param o object to serialize
+	 * @return JSON string representation of {@code o}
+	 */
 	public static String write(Object o) {
 		return Writer.write(o);
 	}
 
+	/**
+	 * Write {@code o} as a JSON string, if serializable. The string will be
+	 * pretty-printed, with tabs and newlines where necessary.
+	 * 
+	 * @param o object to serialize
+	 * @return JSON string representation of {@code o}, formatted with whitespace
+	 */
 	public static String writePretty(Object o) {
 		return Writer.writePretty(o, 0);
 	}
