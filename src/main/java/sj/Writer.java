@@ -45,14 +45,26 @@ final class Writer {
 			return b.toString();
 		if (o == null)
 			return "null";
-		throw new WriterException("cannot serialize the argument's type!");
+		throw new WriterException("not JSON serializable: " + o);
 	}
 
 	private static String writeMap(Map<String, Object> map) {
+		final var size = map.size();
+		if (size == 0) return "{}";
+		final var entries = map.entrySet().stream().toList();
 		final var sb = new StringBuilder("{");
-		for (final var entry : map.entrySet())
-			sb.append('"' + entry.getKey() + "\":" + write(entry.getValue()));
+		for (var i = 0; i < size - 1; ++i)
+			writeEntry(sb, entries.get(i), true);
+		writeEntry(sb, entries.get(size - 1), false);
 		return sb.append('}').toString();
+	}
+
+	private static void writeEntry(StringBuilder sb, Map.Entry<String, Object> entry, boolean comma) {
+		sb	.append('"')
+			.append(entry.getKey())
+			.append("\":")
+			.append(write(entry.getValue()))
+			.append(comma ? "," : "");
 	}
 
 	private static String writeMapPretty(Map<String, Object> map, int depth) {
@@ -76,14 +88,17 @@ final class Writer {
 	}
 
 	private static String writeList(List<Object> list) {
+		final var size = list.size();
+		if (size == 0) return "[]";
 		final var sb = new StringBuilder("[");
-		for (final var value : list)
-			sb.append(write(value));
+		for (var i = 0; i < size - 1; ++i)
+			writeElement(sb, list.get(i), true);
+		writeElement(sb, list.get(size - 1), false);
 		return sb.append(']').toString();
 	}
 
-	public static void main(String[] args) {
-		System.out.println(writeList(List.of("anime")));
+	private static void writeElement(StringBuilder sb, Object element, boolean comma) {
+		sb.append(write(element)).append(comma ? "," : "");
 	}
 
 	private static String writeListPretty(List<Object> list, int depth) {

@@ -39,4 +39,8 @@ public final class Sj {
 	public static String write(Object o) {
 		return Writer.write(o);
 	}
+
+	public static String writePretty(Object o) {
+		return Writer.writePretty(o, 0);
+	}
 }
