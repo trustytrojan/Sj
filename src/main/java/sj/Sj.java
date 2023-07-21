@@ -7,8 +7,7 @@ import java.util.Map;
  * The primary interface of sj.
  */
 public final class Sj {
-	private Sj() {
-	}
+	private Sj() {}
 
 	public static Object parse(String s) {
 		return Parser.parse(Lexer.lex(s));
