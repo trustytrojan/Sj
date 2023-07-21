@@ -24,7 +24,7 @@ final class Parser {
 			return parseObject(tokens);
 		if (firstToken instanceof final ValueToken v)
 			return v.value;
-		throw new ParserException("why?");
+		throw new ParserException("Not valid JSON");
 	}
 
 	static List<Object> parseArray(List<Token> tokens) {
@@ -40,7 +40,7 @@ final class Parser {
 			array.add(parse(tokens.subList(i, j)));
 			i = j;
 		}
-		return Collections.unmodifiableList(array);
+		return array;
 	}
 
 	static Map<String, Object> parseObject(List<Token> tokens) {
@@ -57,7 +57,7 @@ final class Parser {
 			map.put(entry.getKey(), entry.getValue());
 			i = j;
 		}
-		return Collections.unmodifiableMap(map);
+		return map;
 	}
 
 	private static boolean representsObject(List<Token> tokens) {
@@ -90,15 +90,13 @@ final class Parser {
 		for (var i = startIndex; i < size; ++i) {
 			if (depth < 0)
 				throw new ParserException("Invalid JSON container: depth < 0");
-			if (tokens.get(i) instanceof final StructuralToken st)
-				switch (st) {
-					case LEFT_BRACE -> ++depth;
-					case LEFT_BRACKET -> ++depth;
-					case RIGHT_BRACE -> --depth;
-					case RIGHT_BRACKET -> --depth;
-					case COMMA -> { if (depth == 0) return i; }
-					default -> {}
-				}
+			final var token = tokens.get(i);
+			if (token == StructuralToken.LEFT_BRACE || token == StructuralToken.LEFT_BRACKET)
+				++depth;
+			if (token == StructuralToken.RIGHT_BRACE || token == StructuralToken.RIGHT_BRACKET)
+				--depth;
+			if (token == StructuralToken.COMMA && depth == 0)
+				return i;
 		}
 		return size;
 	}

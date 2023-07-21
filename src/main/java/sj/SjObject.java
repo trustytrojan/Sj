@@ -40,6 +40,11 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 		this.map = Objects.requireNonNull(map);
 	}
 
+	@Override
+	public String toString() {
+		return toPrettyJsonString();
+	}
+
 	/**
 	 * @return This {@code SjObject} as a JSON-compliant string string
 	 * @throws IllegalArgumentException if this {@code SjObject} contains values
@@ -48,7 +53,7 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	 */
 	@Override
 	public String toJsonString() throws IllegalArgumentException {
-		return Sj.write(this);
+		return Writer.write(map);
 	}
 
 	/**
@@ -59,7 +64,7 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	 * @see Sj#writePretty
 	 */
 	public String toPrettyJsonString() throws IllegalArgumentException {
-		return Sj.writePretty(this);
+		return Writer.writePretty(map, 0);
 	}
 
 	/**
@@ -224,7 +229,10 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<SjObject> getObjectArray(String key) throws ClassCastException {
-		return getArray(key).stream()
+		final var array = getArray(key);
+		return (array == null)
+			? null
+			: array.stream()
 				.map(o -> new SjObject((Map<String, Object>) o))
 				.toList();
 	}
@@ -245,7 +253,10 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	 *                            cast to a {@code List}
 	 */
 	public List<String> getStringArray(String key) throws ClassCastException {
-		return getArray(key).stream()
+		final var array = getArray(key);
+		return (array == null)
+			? null
+			: array.stream()
 				.map(o -> (String) o)
 				.toList();
 	}

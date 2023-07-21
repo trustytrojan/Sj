@@ -8,10 +8,6 @@ final class Writer {
 
 	@SuppressWarnings("unchecked")
 	static String write(Object o) {
-		if (o == null)
-			return "null";
-		if (o instanceof final SjSerializable ss)
-			return ss.toJsonString();
 		if (o instanceof final Map m)
 			return writeMap(m);
 		if (o instanceof final List l)
@@ -21,10 +17,6 @@ final class Writer {
 
 	@SuppressWarnings("unchecked")
 	static String writePretty(Object o, int depth) {
-		if (o == null)
-			return "null";
-		if (o instanceof final SjSerializable ss)
-			return ss.toJsonString();
 		if (o instanceof final Map m)
 			return writeMapPretty(m, depth);
 		if (o instanceof final List l)
