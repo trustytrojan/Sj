@@ -42,8 +42,11 @@ public final class Sj {
 	 * 
 	 * @param o object to serialize
 	 * @return JSON string representation of {@code o}
+	 * @throws IllegalArgumentException if any values within {@code o} are not JSON
+	 *                                  serializable
+	 * @see Writer#writeValue
 	 */
-	public static String write(Object o) {
+	public static String write(Object o) throws IllegalArgumentException {
 		return Writer.write(o);
 	}
 
@@ -53,8 +56,11 @@ public final class Sj {
 	 * 
 	 * @param o object to serialize
 	 * @return JSON string representation of {@code o}, formatted with whitespace
+	 * @throws IllegalArgumentException if any values within {@code o} are not JSON
+	 *                                  serializable
+	 * @see Writer#writeValue
 	 */
-	public static String writePretty(Object o) {
+	public static String writePretty(Object o) throws IllegalArgumentException {
 		return Writer.writePretty(o, 0);
 	}
 }

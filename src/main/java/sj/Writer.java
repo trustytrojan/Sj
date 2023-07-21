@@ -6,14 +6,10 @@ import java.util.Map;
 final class Writer {
 	private Writer() {}
 
-	private static class WriterException extends RuntimeException {
-		WriterException(String message) {
-			super(message);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	static String write(Object o) {
+		if (o == null)
+			return "null";
 		if (o instanceof final SjSerializable ss)
 			return ss.toJsonString();
 		if (o instanceof final Map m)
@@ -25,6 +21,8 @@ final class Writer {
 
 	@SuppressWarnings("unchecked")
 	static String writePretty(Object o, int depth) {
+		if (o == null)
+			return "null";
 		if (o instanceof final SjSerializable ss)
 			return ss.toJsonString();
 		if (o instanceof final Map m)
@@ -35,6 +33,8 @@ final class Writer {
 	}
 
 	private static String writeValue(Object o) {
+		if (o == null)
+			return "null";
 		if (o instanceof final SjSerializable ss)
 			return ss.toJsonString();
 		if (o instanceof final String s)
@@ -43,9 +43,7 @@ final class Writer {
 			return n.toString();
 		if (o instanceof final Boolean b)
 			return b.toString();
-		if (o == null)
-			return "null";
-		throw new WriterException("not JSON serializable: " + o);
+		throw new IllegalArgumentException("Object of type " + o.getClass().getName() + " cannot be serialized as JSON");
 	}
 
 	private static String writeMap(Map<String, Object> map) {
