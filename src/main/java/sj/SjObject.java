@@ -262,7 +262,7 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	}
 
 	/*
-	 * The rest of the usual Map methods are delegated to this.map.
+	 * The rest of the usual `Map` methods are delegated to `this.map`.
 	 */
 
 	@Override
