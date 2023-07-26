@@ -7,7 +7,8 @@ import java.util.Map;
  * The primary interface of sj.
  */
 public final class Sj {
-	private Sj() {}
+	private Sj() {
+	}
 
 	public static Object parse(String s) {
 		return Parser.parse(Lexer.lex(s));
@@ -37,7 +38,17 @@ public final class Sj {
 	}
 
 	/**
-	 * Write {@code o} as a JSON string, if JSON serializable.
+	 * Write {@code o} as a JSON string, if it is JSON serializable.
+	 * <p>
+	 * Accepted types are:
+	 * <ul>
+	 * <li>{@link String}
+	 * <li>{@link Number}
+	 * <li>{@link Boolean}
+	 * <li>{@link List}<any of these types\>
+	 * <li>{@link Map}<{@link String}, any of these types>
+	 * <li>{@link SjSerializable}
+	 * </ul>
 	 * 
 	 * @param o object to serialize
 	 * @return JSON string representation of {@code o}

@@ -1,38 +1,18 @@
 package sj;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
- * A wrapper of {@code Map} that is {@code SjSerializable}.
- * <p>
- * The primary goal of this class is to add more {@code get} methods that
- * provide automatic casting for the caller (at the caller's discretion). They
- * are named and typed in such a way that instances of {@code SjObject} should
- * be treated as JSON objects. The usual {@code Map} methods are delegated to an
- * internal {@code Map} instance.
- * 
- * @author trustytrojan
+ * An immutable view on a {@code Map<String, Object>} instance.
+ * Has getters that delegate {@code Map.get} calls and cast
+ * the returned values as JSON data types.
  */
-public class SjObject implements SjSerializable, Map<String, Object> {
+public class SjObject {
 	private final Map<String, Object> map;
 
 	/**
-	 * @return An {@code SjObject} using a new {@code HashMap} as the internal map.
-	 */
-	public SjObject() {
-		map = new HashMap<>();
-	}
-
-	/**
-	 * <b>Warning:</b> If this {@code SjObject} will be written to a string, the
-	 * {@code Writer} class will throw an {@code IllegalArgumentException} if
-	 * {@code value} or any values within {@code value} are not JSON serializable.
-	 * 
 	 * @param map a non-null reference to a map to use internally
 	 * @return An {@code SjObject} using {@code map} as the internal map.
 	 */
@@ -40,43 +20,8 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 		this.map = Objects.requireNonNull(map);
 	}
 
-	@Override
-	public String toString() {
-		return toPrettyJsonString();
-	}
-
-	/**
-	 * @return This {@code SjObject} as a JSON-compliant string string
-	 * @throws IllegalArgumentException if this {@code SjObject} contains values
-	 *                                  that are not JSON serializable.
-	 * @see Sj#write
-	 */
-	@Override
-	public String toJsonString() throws IllegalArgumentException {
-		return Writer.write(map);
-	}
-
-	/**
-	 * @return This {@code SjObject} pretty-printed as a string, with newlines
-	 *         separating values and tabs for indentation, to a string.
-	 * @throws IllegalArgumentException if this {@code SjObject} contains values
-	 *                                  that are not JSON serializable.
-	 * @see Sj#writePretty
-	 */
-	public String toPrettyJsonString() throws IllegalArgumentException {
-		return Writer.writePretty(map, 0);
-	}
-
-	/**
-	 * <b>Warning:</b> If this {@code SjObject} will be written to a string, the
-	 * {@code Writer} class will throw an {@code IllegalArgumentException} if
-	 * {@code value} or any values within {@code value} are not JSON serializable.
-	 * 
-	 * @see Writer#writeValue
-	 */
-	@Override
-	public Object put(String key, Object value) {
-		return map.put(key, value);
+	public Object get(String key) {
+		return map.get(key);
 	}
 
 	/**
@@ -259,64 +204,5 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 			: array.stream()
 				.map(o -> (String) o)
 				.toList();
-	}
-
-	/*
-	 * The rest of the usual `Map` methods are delegated to `this.map`.
-	 */
-
-	@Override
-	public Object get(Object key) {
-		return map.get(key);
-	}
-
-	@Override
-	public int size() {
-		return map.size();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return map.isEmpty();
-	}
-
-	@Override
-	public boolean containsKey(Object key) {
-		return map.containsKey(key);
-	}
-
-	@Override
-	public boolean containsValue(Object value) {
-		return map.containsValue(value);
-	}
-
-	@Override
-	public Object remove(Object key) {
-		return map.remove(key);
-	}
-
-	@Override
-	public void putAll(Map<? extends String, ? extends Object> m) {
-		map.putAll(m);
-	}
-
-	@Override
-	public void clear() {
-		map.clear();
-	}
-
-	@Override
-	public Set<String> keySet() {
-		return map.keySet();
-	}
-
-	@Override
-	public Collection<Object> values() {
-		return map.values();
-	}
-
-	@Override
-	public Set<Entry<String, Object>> entrySet() {
-		return map.entrySet();
 	}
 }
