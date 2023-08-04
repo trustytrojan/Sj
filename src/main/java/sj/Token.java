@@ -12,15 +12,17 @@ enum StructuralToken implements Token {
 }
 
 final class ValueToken implements Token {
-	static final ValueToken NULL = new ValueToken(null);
-	static final ValueToken TRUE = new ValueToken(true);
-	static final ValueToken FALSE = new ValueToken(false);
+	static final ValueToken
+		NULL = new ValueToken(null),
+		TRUE = new ValueToken(true),
+		FALSE = new ValueToken(false);
 
 	private static final HashMap<Object, ValueToken> CACHE = new HashMap<>();
 
 	static ValueToken of(Object o) {
 		final var cachedValue = CACHE.get(o);
-		if (cachedValue != null) return cachedValue;
+		if (cachedValue != null)
+			return cachedValue;
 		final var vt = new ValueToken(o);
 		CACHE.put(o, vt);
 		return vt;
@@ -37,7 +39,8 @@ final class ValueToken implements Token {
 	 */
 	@Override
 	public String toString() {
-		if (value == null) return "null";
+		if (value == null)
+			return "null";
 		return value.getClass().getSimpleName() + '(' + ((value instanceof String) ? ('"' + value.toString() + '"') : value) + ')';
 	}
 }

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class Lexer {
-	private static class LexerException extends RuntimeException {
-		LexerException(String message) {
+	private static class SjLexerException extends RuntimeException {
+		SjLexerException(String message) {
 			super(message);
 		}
 	}
@@ -34,7 +34,7 @@ final class Lexer {
 
 			if (c == '.') {
 				if (decimalPointFound) {
-					throw new LexerException("Two decimal points found!");
+					throw new SjLexerException("Two decimal points found!");
 				}
 				decimalPointFound = true;
 				continue;
@@ -74,10 +74,10 @@ final class Lexer {
 						case 'n' -> '\n';
 						case 'r' -> '\r';
 						case 't' -> '\t';
-						default -> throw new LexerException("Input is not a valid JSON string!");
+						default -> throw new SjLexerException("Input is not a valid JSON string!");
 					});
 				}
-				case '"' -> throw new LexerException("Input is not a valid JSON string!");
+				case '"' -> throw new SjLexerException("Input is not a valid JSON string!");
 				default -> sb.append(c);
 			}
 		}
@@ -140,7 +140,7 @@ final class Lexer {
 				case '"': {
 					final var j = indexOfNextUnescapedDoubleQuote(s, i + 1);
 					if (j == -1)
-						throw new LexerException("String not closed");
+						throw new SjLexerException("String not closed");
 					final var str = escapeEscapeSequences(s.substring(i + 1, j));
 					tokens.add(ValueToken.of(str));
 					i = j + 1;
@@ -152,7 +152,7 @@ final class Lexer {
 					if (s.substring(i, i + 4).equals("true"))
 						tokens.add(ValueToken.TRUE);
 					else
-						throw new LexerException("Malformed boolean true");
+						throw new SjLexerException("Malformed boolean true");
 					i += 4;
 					continue;
 
@@ -161,7 +161,7 @@ final class Lexer {
 					if (s.substring(i, i + 5).equals("false"))
 						tokens.add(ValueToken.FALSE);
 					else
-						throw new LexerException("Malformed boolean false");
+						throw new SjLexerException("Malformed boolean false");
 					i += 5;
 					continue;
 
@@ -170,7 +170,7 @@ final class Lexer {
 					if (s.substring(i, i + 4).equals("null"))
 						tokens.add(ValueToken.NULL);
 					else
-						throw new LexerException("Malformed null");
+						throw new SjLexerException("Malformed null");
 					i += 4;
 					continue;
 			}
