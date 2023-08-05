@@ -96,7 +96,7 @@ final class Lexer {
 				continue;
 			}
 
-			if (Character.isDigit(c)) {
+			if (Character.isDigit(c) || c == '-') {
 				final var j = endIndexOfNumber(s, i);
 				final var num = s.substring(i, j);
 				tokens.add(ValueToken.of(parseNumber(num)));
