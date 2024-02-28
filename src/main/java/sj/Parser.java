@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 final class Parser {
-	private static class SjParserException extends RuntimeException {
+	static class SjParserException extends RuntimeException {
 		SjParserException(String message) {
 			super(message);
 		}

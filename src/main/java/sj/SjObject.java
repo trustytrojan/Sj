@@ -11,11 +11,10 @@ import java.util.Set;
 /**
  * A wrapper of {@code Map<String, Object>} that is {@code SjSerializable}.
  * <p>
- * The primary goal of this class is to add more {@code get} methods that
- * provide automatic casting for the caller (at the caller's discretion). They
- * are named and typed in such a way that instances of {@code SjObject} should
- * be treated as JSON objects. The usual {@code Map} methods are delegated to an
- * internal {@code Map} instance.
+ * The primary goal of this class is to add more {@code get} methods that provide automatic casting
+ * for the caller (at the caller's discretion). They are named and typed in such a way that
+ * instances of {@code SjObject} should be treated as JSON objects. The usual {@code Map} methods
+ * are delegated to an internal {@code Map} instance containing the data.
  */
 public class SjObject implements SjSerializable, Map<String, Object> {
 	private Map<String, Object> map;
@@ -28,30 +27,24 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	}
 
 	/**
-	 * <b>Warning:</b> If this {@link SjObject} will be written to a string, the
-	 * {@link Writer} class will throw an {@link IllegalArgumentException} if
-	 * {@link SjObject#map} or any values within {@link SjObject#map} are not JSON serializable.
-	 * 
-	 * @param map a non-null reference to a map to use internally
+	 * @param map a non-null reference to a {@link Map} to use internally
 	 * @return An {@link SjObject} using {@code map} as the internal map.
 	 * @throws NullPointerException if {@code map} is null
 	 */
-	public SjObject(Map<String, Object> map) throws NullPointerException {
+	public SjObject(final Map<String, Object> map) throws NullPointerException {
 		this.map = Objects.requireNonNull(map);
 	}
 
 	/**
 	 * Makes this {@link SjObject} immutable/unmodifiable by applying
-	 * {@link Collections#unmodifiableMap} on {@link SjObject#map}.
-	 * @see Collections#unmodifiableMap(Map)
-	 * @implNote {@link Collections#unmodifiableMap} handles the case when {@link SjObject#map} is already unmodifiable.
+	 * {@link Collections#unmodifiableMap} on {@link #map}.
 	 */
 	public void freeze() {
 		map = Collections.unmodifiableMap(map);
 	}
 
 	/**
-	 * @return {@code toPrettyJsonString()}
+	 * @return {@link #toPrettyJsonString()}
 	 */
 	@Override
 	public String toString() {
@@ -59,9 +52,9 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	}
 
 	/**
-	 * @return This {@link SjObject} as a JSON-compliant string
-	 * @throws IllegalArgumentException if {@link SjObject#map} contains values
-	 *                                  that are not JSON serializable.
+	 * @return This {@link SjObject} as a JSON string
+	 * @throws IllegalArgumentException if {@link SjObject#map} contains values that are not JSON
+	 *         serializable.
 	 * @see Sj#write
 	 */
 	@Override
@@ -70,10 +63,10 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	}
 
 	/**
-	 * @return This {@link SjObject} pretty-printed as a string, with newlines
-	 *         separating values and tabs for indentation, to a string.
-	 * @throws IllegalArgumentException if {@link SjObject#map} contains values
-	 *                                  that are not JSON serializable.
+	 * @return This {@link SjObject} as a JSON string, with newlines separating values and tabs for
+	 *         indentation.
+	 * @throws IllegalArgumentException if {@link #map} contains values that are not JSON
+	 *         serializable.
 	 * @see Sj#writePretty
 	 */
 	public String toPrettyJsonString() throws IllegalArgumentException {
@@ -82,190 +75,199 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link String}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link String}
+	 * @return The {@link String} associated with {@code key}, or {@code null} if explicitly set or
+	 *         if {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link String}
 	 */
-	public String getString(String key) throws ClassCastException {
+	public String getString(final String key) throws ClassCastException {
 		return (String) get(key);
 	}
 
 	/**
-	 * <b>Note:</b> This method is called by the {@link SjObject#getInteger},
-	 * {@link SjObject#getShort}, and {@link SjObject#getByte} methods. The reason
-	 * being is that, when parsed by {@link Parser}, all parsed integers are parsed
-	 * using {@link Long#parseLong}.
-	 * 
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link Long}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Long}
+	 * @return The {@link Number} associated with {@code key}, or {@code null} if explicitly set or
+	 *         if {@code key} is absent. The returned {@link Number} is guaranteed to be either a
+	 *         {@link Long} or a {@link Double}.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Number}
 	 * @see Lexer#parseNumber
 	 */
-	public Long getLong(String key) throws ClassCastException {
-		return (Long) get(key);
+	public Number getNumber(final String key) throws ClassCastException {
+		return (Number) get(key);
 	}
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link Integer}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Long}
+	 * @return The {@link Long} associated with {@code key}, or {@code null} if explicitly set or if
+	 *         {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Number}
+	 * @see #getNumber
 	 */
-	public Integer getInteger(String key) throws ClassCastException {
-		final var l = getLong(key);
-		return (l == null) ? null : l.intValue();
+	public Long getLong(final String key) throws ClassCastException {
+		final var n = getNumber(key);
+		return (n == null) ? null : n.longValue();
 	}
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link Short}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Long}
+	 * @return The {@link Integer} associated with {@code key}, or {@code null} if explicitly set or
+	 *         if {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Number}
+	 * @see #getNumber
 	 */
-	public Short getShort(String key) throws ClassCastException {
-		final var l = getLong(key);
-		return (l == null) ? null : l.shortValue();
+	public Integer getInteger(final String key) throws ClassCastException {
+		final var n = getNumber(key);
+		return (n == null) ? null : n.intValue();
 	}
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link Byte}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Long}
+	 * @return The {@link Short} associated with {@code key}, or {@code null} if explicitly set or
+	 *         if {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Number}
+	 * @see #getNumber
 	 */
-	public Byte getByte(String key) throws ClassCastException {
-		final var l = getLong(key);
-		return (l == null) ? null : l.byteValue();
-	}
-
-	/**
-	 * <b>Note:</b> This method is called by {@link SjObject#getFloat}. The reason
-	 * being is
-	 * that, when parsed by {@link Parser}, all parsed floating point numbers are
-	 * parsed using {@link Double#parseDouble}.
-	 * 
-	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link Double}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Double}
-	 * @see Lexer#parseNumber
-	 */
-	public Double getDouble(String key) throws ClassCastException {
-		return (Double) get(key);
+	public Short getShort(final String key) throws ClassCastException {
+		final var n = getNumber(key);
+		return (n == null) ? null : n.shortValue();
 	}
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link Float}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Double}
+	 * @return The {@link Byte} associated with {@code key}, or {@code null} if explicitly set or if
+	 *         {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Number}
+	 * @see #getNumber
 	 */
-	public Float getFloat(String key) throws ClassCastException {
-		final var d = getDouble(key);
-		return (d == null) ? null : d.floatValue();
+	public Byte getByte(final String key) throws ClassCastException {
+		final var n = getNumber(key);
+		return (n == null) ? null : n.byteValue();
 	}
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link Boolean}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Boolean}
+	 * @return The number associated with {@code key} as a {@link Double}, or {@code null} if explicitly set or
+	 *         if {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Number}
+	 * @see #getNumber
 	 */
-	public Boolean getBoolean(String key) throws ClassCastException {
+	public Double getDouble(final String key) throws ClassCastException {
+		final var n = getNumber(key);
+		return (n == null) ? null : n.doubleValue();
+	}
+
+	/**
+	 * @param key the key whose associated value is to be returned
+	 * @return The number associated with {@code key} as a {@link Float}, or {@code null} if
+	 *         explicitly set or if {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Number}
+	 * @see #getNumber
+	 */
+	public Float getFloat(final String key) throws ClassCastException {
+		final var n = getNumber(key);
+		return (n == null) ? null : n.floatValue();
+	}
+
+	/**
+	 * @param key the key whose associated value is to be returned
+	 * @return The boolean associated with {@code key}, or {@code null} if explicitly set or if
+	 *         {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Boolean}
+	 */
+	public Boolean getBoolean(final String key) throws ClassCastException {
 		return (Boolean) get(key);
 	}
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@code boolean}. If
-	 *         the {@link Boolean} returned by {@link SjObject#getBoolean} is
-	 *         {@code null}, returns {@code false}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Boolean}
+	 * @return The boolean associated with {@code key}, or {@code false} if {@code getBoolean(key)}
+	 *         returns {@code null}.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Boolean}
+	 * @see #getBoolean
 	 */
-	public boolean getBooleanDefaultFalse(String key) throws ClassCastException {
+	public boolean getBooleanDefaultFalse(final String key) throws ClassCastException {
 		final var b = getBoolean(key);
 		return (b == null) ? false : b;
 	}
 
 	/**
-	 * <b>Warning:</b> Use only if you know that the associated {@link Map} only
-	 * contains {@link String} keys. If not, then the behavior of the custom
-	 * {@code get} methods on {@link SjObject} are undefined.
-	 * 
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a
-	 *         {@link Map} and wrapped as an {@link SjObject}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link Map}
-	 * @implNote This method is annotated with {@code @SuppressWarnings("unchecked")}.
+	 * @return The boolean associated with {@code key}, or {@code true} if {@code getBoolean(key)}
+	 *         returns {@code null}.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Boolean}
+	 * @see #getBoolean
+	 */
+	public boolean getBooleanDefaultTrue(final String key) throws ClassCastException {
+		final var b = getBoolean(key);
+		return (b == null) ? true : b;
+	}
+
+	/**
+	 * @param key the key whose associated value is to be returned
+	 * @return The object associated with {@code key}, or {@code null} if explicitly set or if
+	 *         {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link Map}
 	 */
 	@SuppressWarnings("unchecked")
-	public SjObject getObject(String key) throws ClassCastException {
+	public SjObject getObject(final String key) throws ClassCastException {
 		return new SjObject((Map<String, Object>) get(key));
 	}
 
 	/**
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast as a {@link List}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link List}
+	 * @return The array associated with {@code key}, or {@code null} if explicitly set or if
+	 *         {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link List}
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> getArray(String key) throws ClassCastException {
+	public List<Object> getArray(final String key) throws ClassCastException {
 		return (List<Object>) get(key);
 	}
 
 	/**
-	 * <b>Warning:</b> Use only if you know that the associated {@link List} only
-	 * contains {@link Map} instances, and that each {@link Map} instance has only
-	 * {@link String} keys. If not, then either a {@link ClassCastException} will be
-	 * thrown or the contents of the returned {@link List} will be undefined.
-	 * 
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast to a
-	 *         {@link List}, with each element cast to {@link SjObject}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link List}
+	 * @return The array of objects associated with {@code key}, or {@code null} if explicitly set
+	 *         or if {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link List}, or any of its elements cannot be cast to a {@link Map}.
 	 */
 	@SuppressWarnings("unchecked")
-	public List<SjObject> getObjectArray(String key) throws ClassCastException {
+	public List<SjObject> getObjectArray(final String key) throws ClassCastException {
 		final var array = getArray(key);
-		return (array == null)
-				? null
-				: array.stream()
-						.map(o -> new SjObject((Map<String, Object>) o))
-						.toList();
+		return (array == null) ? null
+			: array.stream().map(o -> new SjObject((Map<String, Object>) o)).toList();
 	}
 
 	/**
-	 * <b>Warning:</b> Use only if you know that the associated {@link List} only
-	 * contains {@link String} instances. If not, then either a
-	 * {@link ClassCastException} will be thrown or the contents of the returned
-	 * {@link List} will be undefined.
-	 * 
 	 * @param key the key whose associated value is to be returned
-	 * @return The value associated with {@code key}, cast to a
-	 *         {@link List}, with each element cast to {@link String}.
-	 * @throws ClassCastException if the value associated with {@code key} cannot be
-	 *                            cast to a {@link List}
+	 * @return The array of strings associated with {@code key}, or {@code null} if explicitly set
+	 *         or if {@code key} is absent.
+	 * @throws ClassCastException if the value associated with {@code key} cannot be cast to a
+	 *         {@link List}, or any of its elements cannot be cast to a {@link String}
 	 */
-	public List<String> getStringArray(String key) throws ClassCastException {
+	public List<String> getStringArray(final String key) throws ClassCastException {
 		final var array = getArray(key);
-		return (array == null)
-				? null
-				: array.stream()
-						.map(o -> (String) o)
-						.toList();
+		return (array == null) ? null : array.stream().map(o -> (String) o).toList();
 	}
 
 	/*
-	 * The rest of the usual `Map` methods are delegated to `this.map`.
+	 * The rest of the usual Map methods are delegated to the internal map.
 	 */
 
 	@Override
-	public Object get(Object key) {
+	public Object get(final Object key) {
 		return map.get(key);
 	}
 
@@ -280,41 +282,27 @@ public class SjObject implements SjSerializable, Map<String, Object> {
 	}
 
 	@Override
-	public boolean containsKey(Object key) {
+	public boolean containsKey(final Object key) {
 		return map.containsKey(key);
 	}
 
 	@Override
-	public boolean containsValue(Object value) {
+	public boolean containsValue(final Object value) {
 		return map.containsValue(value);
 	}
 
 	@Override
-	public Object remove(Object key) {
+	public Object remove(final Object key) {
 		return map.remove(key);
 	}
 
-	/**
-	 * <b>Warning:</b> If this {@link SjObject} will be written to a string, the
-	 * {@link Writer} class will throw an {@link IllegalArgumentException} if
-	 * {@code value} or any values within {@code value} are not JSON serializable.
-	 * 
-	 * @see Writer#writeValue
-	 */
 	@Override
-	public Object put(String key, Object value) {
+	public Object put(final String key, final Object value) {
 		return map.put(key, value);
 	}
 
-	/**
-	 * <b>Warning:</b> If this {@link SjObject} will be written to a string, the
-	 * {@link Writer} class will throw an {@link IllegalArgumentException} if
-	 * {@code value} or any values within {@code value} are not JSON serializable.
-	 * 
-	 * @see Writer#writeValue
-	 */
 	@Override
-	public void putAll(Map<? extends String, ? extends Object> m) {
+	public void putAll(final Map<? extends String, ? extends Object> m) {
 		map.putAll(m);
 	}
 

@@ -3,43 +3,55 @@ package sj;
 import java.util.List;
 import java.util.Map;
 
-/**
- * The primary interface of sj.
- */
-public final class Sj {
-	private Sj() {
-	}
+import sj.Parser.SjParserException;
 
+public final class Sj {
+	private Sj() {}
+
+	/**
+	 * Parse a JSON string into a Java value.
+	 * <p>
+	 * JSON to Java type mapping:
+	 * <ul>
+	 * <li>number: {@link Long}, or {@link Double} if a decimal point is present</li>
+	 * <li>string: {@link String}</li>
+	 * <li>object: {@code Map<String, Object>}, where {@link Object} is one of the types in this
+	 * list.</li>
+	 * <li>array: {@code List<Object>}, where {@link Object} is one of the types in this list.</li>
+	 * <li>boolean: {@link Boolean}</li>
+	 * <li>null: {@code null}</li>
+	 * </ul>
+	 */
 	public static Object parse(String s) {
 		return Parser.parse(Lexer.lex(s));
 	}
 
-	public static SjObject parseObject(String s) {
+	/**
+	 * @param s A string representing a JSON object
+	 * @throws SjParserException if {@code s} does not represent a JSON object
+	 */
+	public static SjObject parseObject(String s) throws SjParserException {
 		return new SjObject(Parser.parseObject(Lexer.lex(s)));
 	}
 
+	/**
+	 * @param s A string representing a JSON array
+	 * @throws SjParserException if {@code s} does not represent a JSON array
+	 */
 	public static List<Object> parseArray(String s) {
 		return Parser.parseArray(Lexer.lex(s));
 	}
 
 	/**
-	 * Use only if you know for sure that what you're parsing is a JSON array of
-	 * JSON objects. Will throw {@code ClassCastException} if the array does not
-	 * contain JSON objects.
-	 * 
-	 * @param s JSON string representing array of objects
-	 * @return a list of {@code JsonObject} elements
+	 * @param s A string representing a JSON array of objects
+	 * @throws ClassCastException if the array does not contain JSON objects
 	 */
 	@SuppressWarnings("unchecked")
 	public static List<SjObject> parseObjectArray(String s) {
-		return parseArray(s).stream()
-				.map(x -> new SjObject((Map<String, Object>) x))
-				.toList();
+		return parseArray(s).stream().map(o -> new SjObject((Map<String, Object>) o)).toList();
 	}
 
 	/**
-	 * Write {@code o} as a JSON string, if it is JSON serializable.
-	 * <p>
 	 * Accepted types are:
 	 * <ul>
 	 * <li>{@link String}
@@ -52,8 +64,7 @@ public final class Sj {
 	 * 
 	 * @param o object to serialize
 	 * @return JSON string representation of {@code o}
-	 * @throws IllegalArgumentException if any values within {@code o} are not JSON
-	 *                                  serializable
+	 * @throws IllegalArgumentException if {@code o} is not JSON serializable
 	 * @see Writer#writeValue
 	 */
 	public static String write(Object o) throws IllegalArgumentException {
@@ -61,14 +72,11 @@ public final class Sj {
 	}
 
 	/**
-	 * Write {@code o} as a JSON string, if serializable. The string will be
-	 * pretty-printed, with tabs and newlines where necessary.
-	 * 
 	 * @param o object to serialize
 	 * @return JSON string representation of {@code o}, formatted with whitespace
-	 * @throws IllegalArgumentException if any values within {@code o} are not JSON
-	 *                                  serializable
-	 * @see Writer#writeValue
+	 * @throws IllegalArgumentException if {@code o} is not JSON serializable
+	 * @see #write
+	 * @see Writer#writePretty
 	 */
 	public static String writePretty(Object o) throws IllegalArgumentException {
 		return Writer.writePretty(o, 0);

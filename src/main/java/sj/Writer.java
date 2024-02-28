@@ -30,7 +30,7 @@ final class Writer {
 		if (o instanceof final SjSerializable ss)
 			return ss.toJsonString();
 		if (o instanceof final String s)
-			return '"' + escapeWhitespace(s) + '"';
+			return '"' + escape(s) + '"';
 		if (o instanceof final Number n)
 			return n.toString();
 		if (o instanceof final Boolean b)
@@ -114,7 +114,7 @@ final class Writer {
 		return sb.toString();
 	}
 
-	private static String escapeWhitespace(String s) {
+	private static String escape(String s) {
 		final var sb = new StringBuilder();
 		final var length = s.length();
 		for (var i = 0; i < length; ++i) {

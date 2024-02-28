@@ -5,12 +5,12 @@ import java.util.List;
 
 final class Lexer {
 	private static class SjLexerException extends RuntimeException {
-		SjLexerException(String message) {
+		SjLexerException(final String message) {
 			super(message);
 		}
 	}
 
-	private static int indexOfNextUnescapedDoubleQuote(String s, int start) {
+	private static int indexOfNextUnescapedDoubleQuote(final String s, final int start) {
 		final var length = s.length();
 		for (var i = start; i < length; ++i) {
 			if (s.charAt(i) == '"' && s.charAt(i - 1) != '\\') {
@@ -26,7 +26,7 @@ final class Lexer {
 	 * @return the index of the first character after the number, or the first
 	 *         character that is not a digit. otherwise returns {@code s.length()}.
 	 */
-	private static int endIndexOfNumber(String s, int start) {
+	private static int endIndexOfNumber(final String s, final int start) {
 		final var length = s.length();
 		var decimalPointFound = false;
 		for (var i = (s.charAt(start) == '-') ? (start + 1) : start; i < length; ++i) {
@@ -47,13 +47,13 @@ final class Lexer {
 		return length;
 	}
 
-	private static Number parseNumber(String s) {
+	private static Number parseNumber(final String s) {
 		try { return Long.parseLong(s); }
-		catch (NumberFormatException e) {}
+		catch (final NumberFormatException e) {}
 		return Double.parseDouble(s);
 	}
 
-	private static String escapeEscapeSequences(String s) {
+	private static String escapeEscapeSequences(final String s) {
 		final var length = s.length();
 		final var sb = new StringBuilder();
 		for (int i = 0; i < length; ++i) {
@@ -84,7 +84,7 @@ final class Lexer {
 		return sb.toString();
 	}
 
-	public static List<Token> lex(String s) {
+	public static List<Token> lex(final String s) {
 		final var tokens = new ArrayList<Token>();
 		final var length = s.length();
 		var i = 0;
